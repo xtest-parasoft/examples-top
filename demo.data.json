@@ -6,7 +6,8 @@
     "compilations":    [
         {
             "sourcepath": [
-      "${JSON_DIR}/src/main/java/"
+      "${JSON_DIR}/src/main/java/",
+      "${JSON_DIR}/examples-sub/src/main/java"
             ],
 			"binarypath": [],
             "classpath":  [
