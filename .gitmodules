@@ -1,0 +1,3 @@
+[submodule "examples-sub"]
+	path = examples-sub
+	url = https://github.com/xtest-parasoft/examples-sub
