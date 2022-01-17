@@ -1,36 +1,81 @@
-# This is a basic workflow to help you get started with Actions
+# -------------------------------------------------
+# This workflow runs Parasoft Jtest analysis with selected build tool (maven, gradle, etc)
+# For details on how to configure your project with Jtest please refer to the Jtest examples README file
+# TODO: describe how configure tool to produce SARIF
+# -------------------------------------------------
+# Prerequisites:
+# 1. Set up the Jtest license and other settings in jtestcli.properties in the Jtest installation directory
+name: Parasoft Jtest - locally configured
 
-name: CI
-
-# Controls when the workflow will run
+# Define when the action will run. 
 on:
-  # Triggers the workflow on push or pull request events but only for the main branch
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+  
+  # Triggers the workflow on push, pull request, or other events
+  #push:
+  #  branches: [ main ]
+  #pull_request:
+  #  branches: [ main ]
 
-  # Allows you to run this workflow manually from the Actions tab
+  # Allows to run workflow manually from the Actions tab
   workflow_dispatch:
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
-  build:
+  jtest:
+    name: Jtest job execution
     # The type of runner that the job will run on
-    runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
+    runs-on: self-hosted
+    
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
 
-      # Runs a single command using the runners shell
-      - name: Run a one-line script
-        run: echo Hello, world!
+      - name: Run static analysis
+        # -------------------------------------------------
+        # Prerequisites:
+        # 1. Configure working directory if it is different than repository root
+        #working-directory: examples-top
+        # 2. Enable one of the "Running" steps below.
+        # If you want to fail the step when any Jtest violation is reported, add "-Djtest.fail=true" to Jtest parameters run options.
+          
+        # -------------------------------------------------
+        # Running with Maven
+        # Prerequisites:
+        # 1. Configure your Maven setup by following the Jtest User Guide:
+        # https://docs.parasoft.com/display/JTEST20202/Configuring+the+Jtest+Plugin+for+Maven
+        # 2. Uncomment the following to run the "Recommended Rules" test configuration:
+        #run: mvn jtest:jtest
+        run: D:/_JTest/parasoft_jtest_09.01/jtest/jtestcli.exe -config "builtin://Recommended Rules" -data demo.data.json
+        # or uncomment the following to run the specified test configuration:
+        # run: mvn clean jtest:jtest "-Djtest.config=builtin://Recommended Rules"
+        
+        # -------------------------------------------------
+        # Running with Gradle
+        # Prerequisites:
+        # 1. Configure the installed Jtest package or add the desired settings to the "jtest" block of your buildscript.
+        # 2. Uncomment the following to run the "Recommended Rules" test configuration:
+        # run: gradle clean assemble jtest
+        # or uncomment the following to run the specified test configuration:
+        # run: gradle clean assemble jtest "-Djtest.config=builtin://Recommended Rules"
 
-      # Runs a set of commands using the runners shell
-      - name: Run a multi-line script
-        run: |
-          echo Add other actions to build,
-          echo test, and deploy your project.
+        # -------------------------------------------------
+        # Running with Ant, running with Jtest data file - follow jtest examples README files and run a command
+        # run: 
+          
+      # -------------------------------------------------
+      # Archive the findings reports as job artifact
+      - name: Upload report artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: Report files
+          path: report/report.*
+          # path: demo-project/build/reports/jtest/report.*
+      
+      # -------------------------------------------------
+      # Upload the findings into the GitHub code scanning alert section
+      - name: Upload SARIF file
+        uses: github/codeql-action/upload-sarif@v1
+        with:
+          sarif_file: report/report.sarif  
+      #- TODO: PRODUCE JSON with SARIF FORMAT
