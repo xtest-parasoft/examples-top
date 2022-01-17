@@ -70,7 +70,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: Report files
-        path: report/report.*
+        path: report.*
           # path: demo-project/build/reports/jtest/report.*
       
       # -------------------------------------------------
@@ -78,5 +78,5 @@ jobs:
     - name: Upload SARIF file
       uses: github/codeql-action/upload-sarif@v1
       with:
-        sarif_file: report/report.sarif  
+        sarif_file: report.sarif  
       #- TODO: PRODUCE JSON with SARIF FORMAT
