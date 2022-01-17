@@ -68,3 +68,18 @@ jobs:
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v1
+
+    - name: Upload report artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: Report files
+        path: report/report.*
+          # path: demo-project/build/reports/jtest/report.*
+      
+      # -------------------------------------------------
+      # Upload the findings into the GitHub code scanning alert section
+    - name: Upload SARIF file
+      uses: github/codeql-action/upload-sarif@v1
+      with:
+        sarif_file: report/report.sarif  
+      #- TODO: PRODUCE JSON with SARIF FORMAT
