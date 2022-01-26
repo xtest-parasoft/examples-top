@@ -71,7 +71,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: Report files
-        path: report.*
+        path: results/java.*
           # path: demo-project/build/reports/jtest/report.*
       
       # -------------------------------------------------
